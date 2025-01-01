@@ -2,7 +2,8 @@ import json
 from bcrypt import hashpw, gensalt, checkpw
 
 # Constants
-ALLOWED_DOMAINS = ["@gmail.com", "@brainerx.com"]
+ALLOWED_DOMAINS = ["@gmail.com"] # You can add more domains here!
+DEFAULT_CONTENT = {"users": []}
 FILE_NAME = "users.json"
 
 # Load and Save Users
@@ -10,20 +11,27 @@ def load_users():
     try:
         with open(FILE_NAME, "r") as file:
             content = file.read().strip()
-
             if content:
-                return json.loads(content)
-            return []
+                data = json.loads(content)
+                return data.get("users", [])
+            default_content()
+            return DEFAULT_CONTENT["users"]
     except FileNotFoundError:
         print(f"File not found: {FILE_NAME}")
-        return []
+        default_content()
+        return DEFAULT_CONTENT["users"]
     except json.JSONDecodeError as e:
         print(f"Error decoding JSON from {FILE_NAME}: {e}")
-        return []
+        default_content()
+        return DEFAULT_CONTENT["users"]
 
 def save_users():
-    with open(FILE_NAME, "w") as file:
-        json.dump(users, file)
+    try:
+        with open(FILE_NAME, "w") as file:
+            json.dump({"users": users}, file)
+            print(f"Users successfully saved to {FILE_NAME}.")
+    except IOError as e:
+        print(f"Error saving {FILE_NAME}: {e}")
 
 # Password Handling
 def hash_password(password):
@@ -53,6 +61,11 @@ def get_valid_password():
         print("Error: Password must be at least 5 characters.")
         return None
     return hash_password(password)
+
+def default_content():
+    with open(FILE_NAME, "w") as file:
+        json.dump(DEFAULT_CONTENT, file)
+        print(f"{FILE_NAME} created with default content: {DEFAULT_CONTENT}")
 
 # Global Variables
 users = load_users()
