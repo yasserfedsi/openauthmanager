@@ -93,7 +93,7 @@ If `users.json` does not exist, a new file is initialized with default content.
    $H(p) = bcrypt(salt,\ p)$
 3. Store User:
 
-```json
+```python
 { "email": e, "password": H(p) }
 ```
 
